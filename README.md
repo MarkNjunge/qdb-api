@@ -1,6 +1,7 @@
 # qdb-api
 
 [![NPM](https://nodei.co/npm/qdb-api.png)](https://npmjs.org/package/qdb-api)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FMarkNjunge%2Fqdb-api.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2FMarkNjunge%2Fqdb-api?ref=badge_shield)
 
 An API wrapper for [Quote Database](http://bash.org/).
 
@@ -80,3 +81,7 @@ qdb.search('tom', 0, 10)
 # Disclaimer
 
 Please note that is an unofficial API.
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FMarkNjunge%2Fqdb-api.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2FMarkNjunge%2Fqdb-api?ref=badge_large)
