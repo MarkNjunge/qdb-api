@@ -1,6 +1,7 @@
 # qdb-api
 
-[![NPM](https://nodei.co/npm/qdb-api.png)](https://npmjs.org/package/qdb-api)
+[![NPM](https://nodei.co/npm/qdb-api.png)](https://npmjs.org/package/qdb-api)  
+
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FMarkNjunge%2Fqdb-api.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2FMarkNjunge%2Fqdb-api?ref=badge_shield)
 
 An API wrapper for [qdb.us](http://www.qdb.us/).
