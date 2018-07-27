@@ -1,19 +1,41 @@
 const axios = require('axios').default;
 const cheerio = require('cheerio');
 
+const baseUrl = 'http://www.qdb.us';
+
 function getQuote(id) {
   return new Promise((resolve, reject) => {
     axios
-      .get(`http://bash.org/?${id}`)
+      .get(`${baseUrl}/${id}`)
       .then(response => {
         const $ = cheerio.load(response.data);
 
-        const quote = {
-          id: $('.quote a b')
+        const id = parseInt(
+          $('#vt > table > tbody > tr:nth-child(2) > td > a')
             .text()
-            .substring(1),
-          score: $('.quote font').text(),
-          text: $('.qt').text()
+            .substring(1)
+        );
+
+        const text = $('.qt').text();
+
+        let positiveVotes = 0;
+        let totalVotes = 0;
+
+        $('span').each((i, e) => {
+          if (e.attribs.id == `qs[${id}]`) {
+            parseInt((positiveVotes = e.children[0].data));
+          }
+
+          if (e.attribs.id == `qvc[${id}]`) {
+            parseInt((totalVotes = e.children[0].data.split('/')[1]));
+          }
+        });
+
+        const quote = {
+          id,
+          positiveVotes,
+          totalVotes,
+          text
         };
 
         resolve(quote);
@@ -25,11 +47,11 @@ function getQuote(id) {
 function getRandomId() {
   return new Promise((resolve, reject) => {
     axios
-      .get('http://bash.org/?random')
+      .get(`${baseUrl}/random`)
       .then(response => {
         const $ = cheerio.load(response.data);
 
-        const id = $('.quote a b')
+        const id = $('#vt > table > tbody > tr:nth-child(2) > td > a')
           .first()
           .text()
           .substring(1);
@@ -43,11 +65,11 @@ function getRandomId() {
 function getLatestId() {
   return new Promise((resolve, reject) => {
     axios
-      .get('http://bash.org/?latest')
+      .get(`${baseUrl}/latest`)
       .then(response => {
         const $ = cheerio.load(response.data);
 
-        const id = $('.quote a b')
+        const id = $('#vt > table > tbody > tr:nth-child(2) > td > a')
           .first()
           .text()
           .substring(1);
@@ -59,48 +81,52 @@ function getLatestId() {
 }
 /**
  *
- * @param {String} query The search word
- * @param {Number} sort 0 for score, 1 for number
- * @param {Number} count 10, 25, 50, 75 or 100
+ * @param {String} query The search term
+ * @param {String} order quote_id , real_score or score. Default: score
+ * @param {String} sort desc or asc. Default: desc
+ * @param {Number} limit Number of responses. Default: 10
+ * @param {Number} approved 1 for approved, 0 for pending, -1 for all. Default: 1
  */
-function search(query, sort, count) {
+function search(
+  query,
+  order = 'score',
+  sort = 'desc',
+  count = 10,
+  approved = 1
+) {
   return new Promise((resolve, reject) => {
     axios
-      .get(`http://bash.org/?search=${query}&sort=${sort}&show=${count}`)
+      .get(
+        `${baseUrl}/search?q=${query}&order=${order}&sort=${sort}&limit=${count}&approved=${approved}`
+      )
       .then(response => {
         const $ = cheerio.load(response.data);
 
         const quotes = [];
 
-        /* eslint-disable */
         if (
-          $('center font')
+          $('body > center > div > p > span')
             .text()
-            .includes('No results')
+            .includes('Sorry, your search query returned no results.')
         ) {
-          /* eslint-enable */
           reject('No results returned.');
         } else {
-          $('.quote a b').each((i, element) => {
-            quotes[i] = {};
-            quotes[i].id = element.firstChild.data.substring(1);
-          });
+          const promises = [];
+          for (let index = 0; index < count; index++) {
+            const id = $(
+              `#vt > table > tbody > tr:nth-child(${2 + index}) > td > a`
+            )
+              .text()
+              .split('#')[1];
 
-          $('.quote font').each((i, element) => {
-            quotes[i].score = element.firstChild.data;
-          });
+            promises.push(getQuote(id).then(quote => quotes.push(quote)));
+          }
 
-          $('.qt').each((i, element) => {
-            quotes[i].text = '';
-            element.children.forEach(child => {
-              const data = child.data;
-              if (data && data != '') {
-                quotes[i].text += child.data;
-              }
-            });
-          });
-
-          resolve(quotes);
+          Promise.all(promises)
+            .then(() => {
+              resolve(quotes);
+            })
+            .catch(err => reject(err));
         }
       })
       .catch(reason => reject(reason));

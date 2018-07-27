@@ -1,13 +1,11 @@
+//@ts-check
 const qdb = require('./qdb-api');
 
 qdb
-  .search('tom', 0, 10)
+  .search('ac')
   .then(quotes => {
     quotes.forEach(quote => {
-      console.log(quote.id);
-      console.log(quote.score);
-      console.log(quote.text);
-      console.log('\n');
+      console.log(quote);
     });
   })
   .catch(reason => {
@@ -15,22 +13,18 @@ qdb
   });
 
 qdb
-  .get(4680)
+  .get(6960)
   .then(quote => {
-    console.log(quote.id);
-    console.log(quote.score);
-    console.log(quote.text);
+    console.log(quote);
   })
   .catch(reason => {
-    console.log(reason);
+    console.log(reason.message);
   });
 
 qdb
   .random()
   .then(quote => {
-    console.log(quote.id);
-    console.log(quote.score);
-    console.log(quote.text);
+    console.log(quote);
   })
   .catch(reason => {
     console.log(reason);
@@ -39,9 +33,7 @@ qdb
 qdb
   .latest()
   .then(quote => {
-    console.log(quote.id);
-    console.log(quote.score);
-    console.log(quote.text);
+    console.log(quote);
   })
   .catch(reason => {
     console.log(reason);
